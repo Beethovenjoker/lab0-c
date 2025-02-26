@@ -28,7 +28,7 @@ void q_free(struct list_head *head)
 
     struct list_head *node = NULL, *safe = NULL;
     list_for_each_safe (node, safe, head) {
-        q_release_element(container_of(node, element_t, list))
+        q_release_element(container_of(node, element_t, list));
     }
 }
 
