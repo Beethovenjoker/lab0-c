@@ -27,10 +27,12 @@ void q_free(struct list_head *head)
     if (!head)
         return;
 
-    struct list_head *node = NULL, *safe = NULL;
-    list_for_each_safe (node, safe, head) {
-        q_release_element(container_of(node, element_t, list));
+    element_t *entry = NULL, *safe;
+    list_for_each_entry_safe (entry, safe, head, list) {
+        list_del(&entry->list);
+        q_release_element(entry);
     }
+    free(head);
 }
 
 /* Insert an element at head of queue */
