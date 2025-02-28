@@ -64,11 +64,14 @@ bool q_insert_tail(struct list_head *head, char *s)
 /* Remove an element from head of queue */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    if (!head)
+    if (!head || list_empty(head))
         return NULL;
 
     element_t *node = list_entry(head->next, element_t, list);
-    strncpy(sp, node->value, bufsize);
+    if (sp && bufsize > 0) {
+        strncpy(sp, node->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+    }
     list_del(&node->list);
 
     return node;
@@ -77,7 +80,17 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 /* Remove an element from tail of queue */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return q_remove_head(head->prev->prev, sp, bufsize);
+    if (!head || list_empty(head))
+        return NULL;
+
+    element_t *node = list_entry(head->prev, element_t, list);
+    if (sp && bufsize > 0) {
+        strncpy(sp, node->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
+    }
+    list_del(&node->list);
+
+    return node;
 }
 
 /* Return number of elements in queue */
@@ -164,7 +177,7 @@ int q_ascend(struct list_head *head)
 }
 
 /* Remove every node which has a node with a strictly greater value anywhere to
- * the right side of it */
+ * the right side of i */
 int q_descend(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
