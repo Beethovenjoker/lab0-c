@@ -131,21 +131,14 @@ void q_swap(struct list_head *head)
     if (!head || head->next == head || head->next->next == head)
         return;
 
-    struct list_head *first = head->next;
-    struct list_head *second = first->next;
-    while (first != head && second != head) {
-        first->prev->next = second;
-        second->next->prev = first;
-
-        first->next = second->next;
-        second->prev = first->prev;
-        first->prev = second;
-        second->next = first;
-
-        first = first->next;
-        second = first->next;
+    struct list_head *cur = head->next;
+    struct list_head *tmp = NULL;
+    while (cur->next != head) {
+        tmp = cur->next;
+        list_move(tmp, cur->prev);
+        if (cur != head && cur->next != head)
+            cur = cur->next;
     }
-    return;
 }
 
 /* Reverse elements in queue */
@@ -154,12 +147,9 @@ void q_reverse(struct list_head *head)
     if (!head || list_empty(head) || head->next->next == head)
         return;
 
-    struct list_head *cur = head->next;
-    struct list_head *tmp = NULL;
-    while (cur != head) {
-        tmp = cur->next;
-        list_move(cur, head);
-        cur = tmp;
+    struct list_head *node = NULL, *safe;
+    list_for_each_safe (node, safe, head) {
+        list_move(node, head);
     }
 }
 
