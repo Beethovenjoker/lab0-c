@@ -136,7 +136,6 @@ bool q_delete_dup(struct list_head *head)
             q_release_element(cur);
         }
     }
-
     return true;
 }
 
@@ -171,7 +170,32 @@ void q_reverse(struct list_head *head)
 /* Reverse the nodes of the list k at a time */
 void q_reverseK(struct list_head *head, int k)
 {
-    // https://leetcode.com/problems/reverse-nodes-in-k-group/
+    if (!head || list_empty(head) || k < 2)
+        return;
+
+    struct list_head *node = head->next;
+    struct list_head *group_head = NULL;
+    int counts = 0;
+
+    while (node != head) {
+        counts++;
+
+        if (counts == 1)
+            group_head = node;
+        node = node->next;
+        if (counts == k) {
+            struct list_head *group_tail = node->prev;
+            struct list_head *prev_group = group_head->prev;
+            struct list_head *next_group = node;
+            struct list_head group;
+            INIT_LIST_HEAD(&group);
+            list_cut_position(&group, prev_group, group_tail);
+            q_reverse(&group);
+            list_splice(&group, prev_group);
+            counts = 0;
+            node = next_group;
+        }
+    }
 }
 
 /* Sort elements of queue in ascending/descending order */
@@ -245,6 +269,5 @@ int q_descend(struct list_head *head)
  * order */
 int q_merge(struct list_head *head, bool descend)
 {
-    // https://leetcode.com/problems/merge-k-sorted-lists/
     return 0;
 }
