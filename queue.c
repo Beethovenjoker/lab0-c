@@ -158,7 +158,7 @@ void q_swap(struct list_head *head)
 /* Reverse elements in queue */
 void q_reverse(struct list_head *head)
 {
-    if (!head || list_empty(head) || head->next->next == head)
+    if (!head || list_empty(head) || list_is_singular(head))
         return;
 
     struct list_head *node, *safe;
@@ -313,5 +313,21 @@ int q_descend(struct list_head *head)
  * order */
 int q_merge(struct list_head *head, bool descend)
 {
-    return 0;
+    if (!head)
+        return 0;
+
+    if (list_empty(head) || list_is_singular(head))
+        return q_size(list_entry(head->next, queue_contex_t, chain)->q);
+
+    queue_contex_t *first = list_entry(head->next, queue_contex_t, chain);
+    struct list_head *node = head->next->next;
+
+    while (node != head) {
+        queue_contex_t *cur = list_entry(node, queue_contex_t, chain);
+        if (cur->q) {
+            merge(first->q, cur->q, descend);
+        }
+        node = node->next;
+    }
+    return first->size;
 }
